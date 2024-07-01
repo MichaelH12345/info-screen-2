@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@600&display=swap" rel="stylesheet">
     <style>
-  
+        
         body, html {
             margin: 0;
             padding: 0;
@@ -18,7 +18,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: url('https://raw.githubusercontent.com/MichaelH12345/fonts/main/Info2.png');
+            background-image: url('https://raw.githubusercontent.com/MichaelH12345/fonts/main/Info1.png');
             background-size: cover;
             background-position: center;
         }
@@ -33,8 +33,8 @@
             overflow: hidden;
             cursor: pointer;
             top: 50%;
-            left: 0;
-            transform: translate(-50.25%, -50%);
+            right: 0;
+            transform: translate(50.25%, -50%);
         }
 
         .station-box {
@@ -48,10 +48,9 @@
             overflow: hidden;
             cursor: pointer;
             top: 10%;
-            left: 0%;
-            transform: translateX(-50.25%);
+            right: 0%;
+            transform: translateX(50.25%);
         }
-
         .edit-area {
             position: absolute;
             top: 0;
@@ -79,47 +78,53 @@
 
     <script>
 
-        async function fetchNRCCMessages() {
-            try {
-                const response = await fetch(`https://national-rail-api.davwheat.dev/staffdepartures/${currentStationCode}?expand=true`);
-                const data = await response.json();
-                
-                // Get the station name and update the station box
-                let stationName = data.locationName;
-                stationName = stationName.replace(/[\(\)]/g, ''); // Remove brackets
-                document.getElementById('stationName').innerText = `${stationName} Travel Information`;
-                
-                let nrccMessages = data.nrccMessages;
-                
-                // Replace specific text pattern in messages
-                nrccMessages = nrccMessages.map(message => {
-                    message.xhtmlMessage = message.xhtmlMessage.replace(
-                        /More details can be found in .+?<\/a>\./g, 
-                       
-                    );
-                    return message;
-                });
-                
-                const messageBox = document.getElementById('nrccMessages');
-                
-                if (nrccMessages.length > 0) {
-                    let currentIndex = 0;
-                    messageBox.innerHTML = nrccMessages[currentIndex].xhtmlMessage;
+async function fetchNRCCMessages() {
+    try {
+        const response = await fetch(`https://national-rail-api.davwheat.dev/staffdepartures/${currentStationCode}?expand=true`);
+        const data = await response.json();
+        
+        // Get the station name and update the station box
+        let stationName = data.locationName;
+        stationName = stationName.replace(/[\(\)]/g, ''); // Remove brackets
+        document.getElementById('stationName').innerText = `${stationName} Travel Information`;
+        
+        let nrccMessages = data.nrccMessages;
+        
+        const messageBox = document.getElementById('nrccMessages');
+        
+        if (nrccMessages.length > 0) {
+            let currentIndex = 0;
+            let message = nrccMessages[currentIndex].xhtmlMessage;
 
-                    if (nrccMessages.length > 1) {
-                        setInterval(() => {
-                            currentIndex = (currentIndex + 1) % nrccMessages.length;
-                            messageBox.innerHTML = nrccMessages[currentIndex].xhtmlMessage;
-                        }, 15000); // 15000 milliseconds = 15 seconds
-                    }
-                } else {
-                    messageBox.innerHTML = 'For live departure information, call National Rail Enquiries on 03457 48 49 50, or visit nationalrail.co.uk/live-trains';
-                }
-            } catch (error) {
-                document.getElementById('nrccMessages').innerHTML = 'For live departure information, call National Rail Enquiries on 03457 48 49 50, or visit nationalrail.co.uk/live-trains';
+            // Replace 'More details' and everything after it with 'e'
+            const moreDetailsIndex = message.indexOf('More details');
+            if (moreDetailsIndex !== -1) {
+                message = message.substring(0, moreDetailsIndex) + '';
             }
-        }
 
+            messageBox.innerHTML = message;
+
+            if (nrccMessages.length > 1) {
+                setInterval(() => {
+                    currentIndex = (currentIndex + 1) % nrccMessages.length;
+                    let message = nrccMessages[currentIndex].xhtmlMessage;
+
+                    // Replace 'More details' and everything after it with 'e'
+                    const moreDetailsIndex = message.indexOf('More details');
+                    if (moreDetailsIndex !== -1) {
+                        message = message.substring(0, moreDetailsIndex) + '';
+                    }
+
+                    messageBox.innerHTML = message;
+                }, 15000); // 15000 milliseconds = 15 seconds
+            }
+        } else {
+            messageBox.innerHTML = 'For live departure information, call National Rail Enquiries on 03457 48 49 50, or visit nationalrail.co.uk/live-trains';
+        }
+    } catch (error) {
+        document.getElementById('nrccMessages').innerHTML = 'For live departure information, call National Rail Enquiries on 03457 48 49 50, or visit nationalrail.co.uk/live-trains';
+    }
+}
         // Function to handle editing text permanently
         function editText(elementId) {
             const element = document.getElementById(elementId);
