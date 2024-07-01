@@ -36,6 +36,17 @@
             left: 0;
             transform: translate(-50.25%, -50%);
         }
+        .time-box {
+    position: absolute;
+    font-family: 'Noto Sans', sans-serif;
+    color: white;
+    font-size: 100px;
+    padding: 20px;
+    text-align: center;
+    cursor: default;
+    bottom: 75px; /* 50 pixels from the bottom */
+    right: 100px; /* 50 pixels from the right */
+}
 
         .station-box {
             position: absolute;
@@ -76,6 +87,8 @@
     <div class="message-box" id="nrccMessages" onclick="editText('nrccMessages')">
         Click to edit NRCC messages
     </div>
+    <div class="time-box" id="currentTime">
+</div>
 
     <script>
 
@@ -144,8 +157,24 @@
                 fetchNRCCMessages(); // Fetch messages for the new station
             }
         }
+        
 
         fetchNRCCMessages();
+        
+        // Function to update the time every second
+function updateTime() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    document.getElementById('currentTime').innerText = `${hours}:${minutes}`;
+}
+
+// Initial call to update time when the page loads
+updateTime();
+
+// Update time every second
+setInterval(updateTime, 1000);
     </script>
 </body>
 </html>
