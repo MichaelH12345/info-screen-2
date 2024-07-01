@@ -32,7 +32,7 @@
             text-align: center;
             overflow: hidden;
             cursor: pointer;
-            top: 50%;
+            top: 55%;
             left: 0;
             transform: translate(-50.25%, -50%);
         }
@@ -100,7 +100,7 @@
             // Replace 'More details' and everything after it with 'e'
             const moreDetailsIndex = message.indexOf('More details');
             if (moreDetailsIndex !== -1) {
-                message = message.substring(0, moreDetailsIndex) + 'e';
+                message = message.substring(0, moreDetailsIndex) + '';
             }
 
             messageBox.innerHTML = message;
