@@ -1,0 +1,146 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NRCC Messages</title>
+    <style>
+        @font-face {
+            font-family: 'NewBrunel';
+            src: url('https://raw.githubusercontent.com/MichaelH12345/fonts/main/NewBrunel-Regular.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('https://raw.githubusercontent.com/MichaelH12345/fonts/main/Info2.png');
+            background-size: cover;
+            background-position: center;
+        }
+        .message-box {
+            position: absolute;
+            font-family: 'NewBrunel', sans-serif;
+            color: white;
+            font-size: 125px;
+            width: 3000px;
+            padding: 20px;
+            text-align: center;
+            overflow: hidden;
+            cursor: pointer;
+            top: 25.5%;
+            left: 0;
+            transform: translate(-50%);
+        }
+
+        .station-box {
+            position: absolute;
+            font-family: 'NewBrunel', sans-serif;
+            color: white;
+            font-size: 100px;
+            width: 3000px;
+            padding: 20px;
+            text-align: center;
+            overflow: hidden;
+            cursor: pointer;
+            top: 10%;
+            left: 0%;
+            transform: translateX(-50.5%);
+        }
+        .edit-area {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0); /* Fully transparent */
+            transition: background-color 0.1s ease; /* Smooth transition for background color */
+        }
+        .edit-area:hover {
+            background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent white on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-area" onclick="changeStationName()">
+    </div>
+    <div class="station-box" id="stationName" onclick="editText('stationName')">
+        Click to edit station name
+    </div>
+    <div class="message-box" id="nrccMessages" onclick="editText('nrccMessages')">
+        Click to edit NRCC messages
+    </div>
+
+    <script>
+
+        async function fetchNRCCMessages() {
+            try {
+                const response = await fetch(`https://national-rail-api.davwheat.dev/staffdepartures/${currentStationCode}?expand=true`);
+                const data = await response.json();
+                
+                // Get the station name and update the station box
+                let stationName = data.locationName;
+                stationName = stationName.replace(/[\(\)]/g, ''); // Remove brackets
+                document.getElementById('stationName').innerText = `${stationName} Travel Information`;
+                
+                let nrccMessages = data.nrccMessages;
+                
+                // Replace specific text pattern in messages
+                nrccMessages = nrccMessages.map(message => {
+                    message.xhtmlMessage = message.xhtmlMessage.replace(
+                        /More details can be found in .+?<\/a>\./g, 
+                       
+                    );
+                    return message;
+                });
+                
+                const messageBox = document.getElementById('nrccMessages');
+                
+                if (nrccMessages.length > 0) {
+                    let currentIndex = 0;
+                    messageBox.innerHTML = nrccMessages[currentIndex].xhtmlMessage;
+
+                    if (nrccMessages.length > 1) {
+                        setInterval(() => {
+                            currentIndex = (currentIndex + 1) % nrccMessages.length;
+                            messageBox.innerHTML = nrccMessages[currentIndex].xhtmlMessage;
+                        }, 15000); // 15000 milliseconds = 15 seconds
+                    }
+                } else {
+                    messageBox.innerHTML = 'For live departure information, call National Rail Enquiries on 03457 48 49 50, or visit nationalrail.co.uk/live-trains';
+                }
+            } catch (error) {
+                document.getElementById('nrccMessages').innerHTML = 'For live departure information, call National Rail Enquiries on 03457 48 49 50, or visit nationalrail.co.uk/live-trains';
+            }
+        }
+
+        // Function to handle editing text permanently
+        function editText(elementId) {
+            const element = document.getElementById(elementId);
+            const newText = prompt('Enter new text:');
+            if (newText !== null && newText !== '') {
+                element.innerText = newText;
+            }
+        }
+
+        // Function to change station name based on user input
+        function changeStationName() {
+            const newStation = prompt('Enter new station name:');
+            if (newStation !== null && newStation !== '') {
+                currentStationCode = newStation.trim().toUpperCase();
+                fetchNRCCMessages(); // Fetch messages for the new station
+            }
+        }
+
+        fetchNRCCMessages();
+    </script>
+</body>
+</html>
