@@ -37,16 +37,16 @@
             transform: translate(-50.25%, -50%);
         }
         .time-box {
-    position: absolute;
-    font-family: 'Noto Sans', sans-serif;
-    color: white;
-    font-size: 75px;
-    padding: 20px;
-    text-align: center;
-    cursor: default;
-    bottom: 75px; /* 50 pixels from the bottom */
-    right: 100px; /* 50 pixels from the right */
-}
+            position: absolute;
+            font-family: 'Noto Sans', sans-serif;
+            color: white;
+            font-size: 75px;
+            padding: 20px;
+            text-align: center;
+            cursor: default;
+            bottom: 75px; /* 50 pixels from the bottom */
+            right: 100px; /* 50 pixels from the right */
+        }
 
         .station-box {
             position: absolute;
@@ -102,32 +102,13 @@
         // Function to update the date and time every second
         function updateDateTime() {
             const now = new Date();
-            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
             
-            const dayOfWeek = days[now.getDay()];
-            const dayOfMonth = now.getDate();
-            const month = months[now.getMonth()];
-            const year = now.getFullYear();
+            const formattedTime = `${hours}:${minutes}:${seconds}`;
             
-            const ordinalSuffix = getOrdinalSuffix(dayOfMonth); // Function to get the ordinal suffix (st, nd, rd, th)
-            
-            const formattedDate = `${dayOfWeek} ${dayOfMonth}${ordinalSuffix} ${month} ${year}`;
-            
-            document.getElementById('currentDateTime').innerText = formattedDate;
-        }
-
-        // Function to get the ordinal suffix for the day of the month
-        function getOrdinalSuffix(day) {
-            if (day % 10 === 1 && day !== 11) {
-                return 'st';
-            } else if (day % 10 === 2 && day !== 12) {
-                return 'nd';
-            } else if (day % 10 === 3 && day !== 13) {
-                return 'rd';
-            } else {
-                return 'th';
-            }
+            document.getElementById('currentDateTime').innerText = formattedTime;
         }
 
         // Function to update the NRCC messages
@@ -217,4 +198,3 @@
     </script>
 </body>
 </html>
-
