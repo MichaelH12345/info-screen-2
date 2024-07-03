@@ -190,29 +190,11 @@
             }
         }
 
-        // Function to get station code from URL
-        function getStationCodeFromURL() {
-            const urlParams = new URLSearchParams(window.location.pathname.split('/').pop());
-            return urlParams ? urlParams.toUpperCase() : '';
-        }
-
         // Initial call to update date and time when the page loads
         updateDateTime();
 
         // Update date and time every second
         setInterval(updateDateTime, 1000);
-
-        // Get the station code from the URL and fetch messages
-        window.onload = () => {
-            const stationCode = getStationCodeFromURL();
-            if (stationCode) {
-                currentStationCode = stationCode;
-                fetchNRCCMessages();
-            } else {
-                document.getElementById('stationName').innerText = 'No station code provided';
-                cycleFallbackMessages();
-            }
-        };
     </script>
 </body>
 </html>
